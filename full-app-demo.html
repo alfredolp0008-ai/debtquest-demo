@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DebtQuest — Full Demo</title>
+<style>
+  /* ============== RESET ============== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body {
+    background: #0a0a10;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+  /* ============== HEADER ============== */
+  header { padding: 24px 16px 12px; text-align: center; }
+  header h1 { font-size: clamp(22px, 4vw, 30px); font-weight: 800; letter-spacing: -0.02em; }
+  header .sub { color: #64748b; font-size: 12px; margin-top: 6px; }
+
+  .theme-bar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 12px 16px 0; }
+  .theme-btn { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); color: #cbd5e1; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+  .theme-btn.active { background: var(--accent, #06b6d4); color: #000; border-color: var(--accent); }
+
+  /* ============== PHONE FRAME ============== */
+  .phone {
+    max-width: 420px;
+    margin: 20px auto 60px;
+    border-radius: 36px;
+    background: var(--bg, linear-gradient(135deg, #0a0e1a, #131831));
+    padding: 24px 14px 28px;
+    transition: background 0.6s ease;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ============== SHARED CARD ============== */
+  .card {
+    position: relative;
+    border-radius: 18px;
+    padding: 14px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .card.hero { border-radius: 22px; padding: 18px; border-color: color-mix(in srgb, var(--accent) 25%, transparent); box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .label-tiny { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; color: rgba(255,255,255,0.55); text-transform: uppercase; }
+  .money-big { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; font-weight: 900; }
+
+  /* ============== PLAYER LEVEL ============== */
+  .player .top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .player .title { font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -0.01em; }
+  .level-badge { padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 20%, transparent); border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent); text-align: center; }
+  .level-badge .lvl-label { font-size: 9px; font-weight: 800; letter-spacing: 0.18em; color: rgba(255,255,255,0.75); display: block; }
+  .level-badge .lvl-num { font-size: 24px; font-weight: 900; color: #fff; line-height: 1; }
+  .xp-bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; position: relative; margin-top: 10px; }
+  .xp-fill { position: absolute; inset: 0; width: 62%; border-radius: 999px; background: linear-gradient(to right, color-mix(in srgb, var(--accent) 90%, transparent), var(--accent)); box-shadow: 0 0 10px var(--accent); animation: pulseGlow 2.2s ease-in-out infinite; }
+  @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 50%, transparent); } 50% { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 90%, transparent); } }
+  .player .footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-top: 8px; }
+  .player .footer .left { color: rgba(255,255,255,0.75); }
+  .player .footer .right { color: rgba(255,255,255,0.45); font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; }
+
+  /* ============== DREAM HOME ============== */
+  .home .head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .home .home-name { font-size: 15px; font-weight: 800; color: #fff; margin-top: 2px; }
+  .clock-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(251,191,36,0.4); font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9); font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; }
+  .clock-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 6px #fbbf24; animation: pulseGlow 2s ease-in-out infinite; }
+  .countdown { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; background: rgba(0,0,0,0.25); margin-top: 10px; }
+  .countdown .icon { color: var(--accent); font-size: 18px; }
+  .countdown .left { display: flex; flex-direction: column; gap: 1px; }
+  .countdown .left .lbl { font-size: 9px; font-weight: 800; letter-spacing: 0.16em; color: rgba(255,255,255,0.55); }
+  .countdown .left .val { font-size: 18px; font-weight: 800; color: #fff; }
+  .countdown .right { margin-left: auto; text-align: right; }
+  .countdown .right .lbl { font-size: 9px; font-weight: 800; letter-spacing: 0.16em; color: rgba(255,255,255,0.55); }
+  .countdown .right .val { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .scene { margin-top: 12px; border-radius: 14px; height: 200px; background: linear-gradient(to bottom, rgba(30,58,138,0.35), rgba(12,31,61,0.45)); position: relative; overflow: hidden; }
+  .scene.late { background: linear-gradient(to bottom, rgba(125,211,252,0.35), rgba(251,191,36,0.45)); }
+  .scene-content { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; gap: 12px; padding: 0 20px 12px; }
+  /* House — simplified SVG-style ASCII house */
+  .house { width: 130px; height: 150px; position: relative; transition: opacity 0.4s; }
+  .house .roof { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-bottom: 50px solid #7c2d12; }
+  .house .wall { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 110px; height: 60px; background: linear-gradient(to bottom, #d4a373, #a47148); }
+  .house .door { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); width: 24px; height: 36px; background: #3b2415; border-radius: 2px 2px 0 0; }
+  .house .door::after { content: ''; position: absolute; right: 4px; top: 50%; width: 4px; height: 4px; border-radius: 50%; background: #fbbf24; }
+  .house .windows { position: absolute; top: 76px; left: 50%; transform: translateX(-50%); display: flex; gap: 18px; }
+  .house .windows .w { width: 22px; height: 18px; background: #bae6fd; border: 1.5px solid #475569; border-radius: 2px; }
+  .house .foundation { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 124px; height: 12px; background: #475569; border-radius: 2px; }
+  .house .key { position: absolute; top: -10px; right: -20px; font-size: 24px; color: #fbbf24; filter: drop-shadow(0 0 8px #fbbf24); transform: rotate(-15deg); }
+  /* Pet */
+  .pet { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, var(--pet-color, #a855f7) 0%, color-mix(in srgb, var(--pet-color) 70%, black) 100%); position: relative; animation: bob 1.4s ease-in-out infinite alternate; }
+  .pet::before, .pet::after { content: ''; position: absolute; top: 14px; width: 5px; height: 5px; background: black; border-radius: 50%; }
+  .pet::before { left: 11px; } .pet::after { right: 11px; }
+  .pet .mouth { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); width: 14px; height: 6px; border-bottom: 2px solid rgba(0,0,0,0.6); border-radius: 0 0 14px 14px; }
+  .pet .crown { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #fde047; filter: drop-shadow(0 0 4px #fbbf24); }
+  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+
+  .stage-bar { display: flex; gap: 4px; margin-top: 10px; }
+  .stage-dot { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.12); }
+  .stage-dot.lit { background: var(--accent); }
+  .stage-label { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 6px; }
+
+  /* ============== STATS GRID ============== */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { border-radius: 14px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 4px; }
+  .stat .l { font-size: 9px; font-weight: 800; letter-spacing: 0.18em; color: rgba(255,255,255,0.55); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .stat .v { font-size: 20px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+  .stat .v.mono { font-family: ui-monospace, monospace; }
+  .stat .s { font-size: 11px; font-weight: 600; }
+  .stat.dfree .s { color: var(--accent); } .stat.dfree { border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+  .stat.debt .s { color: #f87171; } .stat.debt { border-color: rgba(239,68,68,0.20); }
+  .stat.paid .s { color: #34d399; } .stat.paid { border-color: rgba(16,185,129,0.20); }
+  .stat.streak { border-color: rgba(251,191,36,0.25); }
+  .stat.streak .s { color: var(--accent); }
+  .stat.streak .row { display: flex; align-items: baseline; gap: 4px; }
+  .stat.streak .row .days { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); }
+  .flame { width: 16px; height: 20px; position: relative; }
+  .flame .lyr { position: absolute; inset: 0; clip-path: path("M8 0 Q16 4 16 12 Q16 20 8 20 Q0 20 0 12 Q0 4 8 0"); }
+  .flame .outer { background: linear-gradient(to bottom, rgba(239,68,68,0.85), rgba(239,68,68,0.55)); animation: f1 0.22s ease-in-out infinite alternate; }
+  .flame .mid { background: linear-gradient(to bottom, rgba(249,115,22,0.9), rgba(249,115,22,0.65)); transform: scale(0.75); animation: f2 0.17s ease-in-out infinite alternate; }
+  .flame .core { background: linear-gradient(to bottom, rgba(251,191,36,0.95), rgba(251,191,36,0.75)); transform: scale(0.45); animation: f3 0.13s ease-in-out infinite alternate; }
+  @keyframes f1 { from{transform:scale(1)}to{transform:scale(1.05)} } @keyframes f2 { from{transform:scale(0.75)}to{transform:scale(0.82)} } @keyframes f3 { from{transform:scale(0.45)}to{transform:scale(0.53)} }
+
+  /* ============== PROGRESS BAR ============== */
+  .progress-card { display: flex; flex-direction: column; gap: 8px; }
+  .progress-card .head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; }
+  .progress-card .head .lbl { color: rgba(255,255,255,0.55); font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+  .progress-card .head .pct { font-size: 16px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .progress-card .track { height: 16px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; position: relative; }
+  .progress-card .fill { position: absolute; top: 0; bottom: 0; left: 0; width: 64%; border-radius: 999px; background: linear-gradient(to right, color-mix(in srgb, var(--accent) 85%, transparent), var(--accent)); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); overflow: hidden; }
+  .progress-card .stripes { position: absolute; inset: 0; background-image: repeating-linear-gradient(60deg, rgba(255,255,255,0.13) 0 8px, transparent 8px 24px); animation: stripeMove 1.4s linear infinite; }
+  @keyframes stripeMove { from{background-position:0 0}to{background-position:24px 0} }
+
+  /* ============== CURRENT TARGET ============== */
+  .target { position: relative; border-radius: 22px; padding: 18px; background: rgba(255,255,255,0.06); backdrop-filter: blur(18px); border: 1.5px solid var(--boss-color, #dc2626); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 22px color-mix(in srgb, var(--boss-color) 25%, transparent); animation: breathe 3.4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.005)} }
+  .target .head { display: flex; justify-content: space-between; align-items: center; }
+  .boss-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--boss-color) 22%, transparent); border: 1px solid color-mix(in srgb, var(--boss-color) 55%, transparent); box-shadow: 0 0 8px color-mix(in srgb, var(--boss-color) 50%, transparent); font-size: 10px; font-weight: 800; color: #fff; letter-spacing: 0.06em; }
+  .target .name { font-size: 20px; font-weight: 800; color: #fff; }
+  .target .balance { display: flex; align-items: baseline; gap: 8px; }
+  .target .balance .big { font-size: 30px; font-weight: 900; color: #fff; font-family: ui-monospace, monospace; }
+  .target .balance .apr { font-size: 11px; color: rgba(255,255,255,0.55); }
+  .target .payoff { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.85); }
+  .target .payoff .icn { color: var(--accent); font-weight: 800; }
+  .whatif { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 20%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: #fff; font-weight: 700; font-size: 11px; align-self: flex-start; cursor: pointer; }
+
+  /* ============== QUEUE ============== */
+  .queue-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 8px; }
+  .queue-head .lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; color: rgba(255,255,255,0.55); text-transform: uppercase; }
+  .queue-controls { display: flex; gap: 6px; align-items: center; }
+  .strat-toggle { display: inline-flex; padding: 2px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
+  .strat-toggle button { padding: 4px 10px; border-radius: 999px; border: none; background: none; color: rgba(255,255,255,0.7); font-size: 9px; font-weight: 900; letter-spacing: 0.1em; cursor: pointer; }
+  .strat-toggle button.active { background: var(--accent); color: #000; }
+  .add-btn { font-size: 22px; color: var(--accent); cursor: pointer; }
+
+  .row { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px; cursor: pointer; }
+  .row.target-row { border-color: color-mix(in srgb, var(--accent) 45%, transparent); border-width: 1.5px; }
+  .row.killed .name { text-decoration: line-through; opacity: 0.5; }
+  .boss-circle { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; background: color-mix(in srgb, var(--rc, #dc2626) 18%, transparent); border: 1.5px solid color-mix(in srgb, var(--rc) 55%, transparent); }
+  .row .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .row .name-row { display: flex; gap: 6px; align-items: center; }
+  .row .name { font-weight: 800; font-size: 13px; color: #fff; }
+  .target-pill { font-size: 7px; font-weight: 900; letter-spacing: 0.16em; padding: 2px 5px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent); }
+  .row .bar { height: 3px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+  .row .bar-f { height: 100%; background: color-mix(in srgb, var(--rc) 85%, transparent); }
+  .row .meta { display: flex; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.5); }
+  .row .meta .bal { font-weight: 700; color: rgba(255,255,255,0.85); font-family: ui-monospace, monospace; }
+  .row .chev { color: rgba(255,255,255,0.4); font-weight: 800; }
+  .paid-stamp { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; background: rgba(16,185,129,0.85); border: 2px solid #10b981; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: 0.3em; transform: rotate(-8deg); box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+  .killed-hdr { font-size: 9px; font-weight: 800; letter-spacing: 0.18em; color: rgba(16,185,129,0.75); text-transform: uppercase; margin: 10px 0 4px; }
+
+  /* ============== DAILY QUESTS ============== */
+  .quest-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; background: rgba(255,255,255,0.03); margin-bottom: 4px; cursor: pointer; }
+  .quest-row.done .name { text-decoration: line-through; opacity: 0.5; }
+  .quest-icon { width: 30px; height: 30px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; }
+  .quest-row.done .quest-icon { background: rgba(16,185,129,0.25); color: #34d399; }
+  .quest-name { flex: 1; font-size: 13px; color: #fff; }
+  .quest-xp { display: inline-flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); font-size: 10px; font-weight: 900; color: var(--accent); font-family: ui-monospace, monospace; }
+  .quest-row.done .quest-xp { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); }
+
+  /* ============== TROPHY HALL ============== */
+  .trophy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .trophy { border-radius: 12px; padding: 8px 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .trophy.earned { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+  .medal { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; position: relative; overflow: hidden; }
+  .medal.locked { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.08); }
+  .medal.bronze { background: linear-gradient(to bottom, #fde68a, #d97706, #78350f); color: rgba(0,0,0,0.85); border: 2px solid #d97706; box-shadow: 0 0 8px rgba(217,119,6,0.4); }
+  .medal.silver { background: linear-gradient(to bottom, #f1f5f9, #94a3b8, #475569); color: rgba(0,0,0,0.85); border: 2px solid #94a3b8; box-shadow: 0 0 8px rgba(148,163,184,0.4); }
+  .medal.gold   { background: linear-gradient(to bottom, #fde047, #fbbf24, #b8860b); color: rgba(0,0,0,0.85); border: 2px solid #fbbf24; box-shadow: 0 0 8px rgba(251,191,36,0.4); }
+  .medal.plat   { background: linear-gradient(to bottom, #e0f2fe, #bae6fd, #0ea5e9); color: rgba(0,0,0,0.85); border: 2px solid #bae6fd; box-shadow: 0 0 8px rgba(186,230,253,0.4); }
+  .trophy .t-name { font-size: 9px; font-weight: 900; color: #fff; text-align: center; line-height: 1.2; }
+  .trophy:not(.earned) .t-name { color: rgba(255,255,255,0.3); }
+
+  footer { text-align: center; padding: 20px; color: #475569; font-size: 11px; }
+  footer code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DebtQuest 🔥 — full app demo</h1>
+  <div class="sub">All 7 Debt-tab cards, live, interactive · matches SwiftUI 1:1</div>
+</header>
+
+<div class="theme-bar" id="theme-bar"></div>
+
+<div class="phone" id="phone">
+  <div class="stack">
+
+    <!-- 1. PLAYER LEVEL -->
+    <div class="card hero player">
+      <div class="top">
+        <div>
+          <div class="label-tiny">Player Level</div>
+          <div class="title" id="pl-title">Debt Slayer</div>
+        </div>
+        <div class="level-badge">
+          <span class="lvl-label">LVL</span>
+          <span class="lvl-num" id="pl-num">12</span>
+        </div>
+      </div>
+      <div class="xp-bar"><div class="xp-fill" id="pl-fill"></div></div>
+      <div class="footer">
+        <span class="left" id="pl-next">Next reward in 412 XP</span>
+        <span class="right" id="pl-total">5,840 XP</span>
+      </div>
+    </div>
+
+    <!-- 2. DREAM HOME -->
+    <div class="card hero home">
+      <div class="head">
+        <div>
+          <div class="label-tiny">Dream Home Build</div>
+          <div class="home-name">Lakeside Cabin</div>
+        </div>
+        <div class="clock-pill"><span class="dot"></span><span id="clock">12:34:56 PM</span></div>
+      </div>
+      <div class="countdown">
+        <span class="icon">🏠</span>
+        <div class="left"><span class="lbl">Move-In Countdown</span><span class="val">2 yrs · 4 mo</span></div>
+        <div class="right"><div class="lbl">Target</div><div class="val">Sep 2028</div></div>
+      </div>
+      <div class="scene" id="scene">
+        <div class="scene-content">
+          <div class="house" id="house">
+            <div class="roof"></div>
+            <div class="wall"></div>
+            <div class="windows"><div class="w"></div><div class="w"></div></div>
+            <div class="door"></div>
+            <div class="foundation"></div>
+          </div>
+          <div class="pet" style="--pet-color: #a855f7">
+            <span class="mouth"></span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-bar" id="stages"></div>
+      <div class="stage-label" id="stage-label">Windows In · 4 / 6</div>
+    </div>
+
+    <!-- 3. HEADLINE STATS -->
+    <div class="stats-grid">
+      <div class="stat dfree">
+        <div class="l">Debt-Free</div>
+        <div class="v">2y · 4mo</div>
+        <div class="s">Sep 2028</div>
+      </div>
+      <div class="stat streak">
+        <div class="l"><span>Streak</span><div class="flame"><div class="lyr outer"></div><div class="lyr mid"></div><div class="lyr core"></div></div></div>
+        <div class="row"><span class="v">18</span><span class="days">days</span></div>
+        <div class="s">Heating up</div>
+      </div>
+      <div class="stat debt">
+        <div class="l">Total Debt</div>
+        <div class="v mono">$18,247</div>
+        <div class="s">4 active</div>
+      </div>
+      <div class="stat paid">
+        <div class="l">Paid</div>
+        <div class="v">64%</div>
+        <div class="s">3 killed</div>
+      </div>
+    </div>
+
+    <!-- 4. OVERALL PROGRESS BAR -->
+    <div class="card progress-card">
+      <div class="head">
+        <span class="lbl">Overall Progress</span>
+        <span class="pct">64%</span>
+      </div>
+      <div class="track"><div class="fill"><div class="stripes"></div></div></div>
+    </div>
+
+    <!-- 5. CURRENT TARGET -->
+    <div class="target" style="--boss-color: #3b82f6">
+      <div class="head">
+        <span class="label-tiny">Current Target</span>
+        <span class="boss-chip">🦈 Loan Shark</span>
+      </div>
+      <div class="name">Citi Visa</div>
+      <div class="balance"><span class="big">$2,840</span><span class="apr">@ 27.99%</span></div>
+      <div class="payoff"><span class="icn">◎</span>Killed in ~14 months at current pace</div>
+      <button class="whatif">✦ What if +$50 / mo? ›</button>
+    </div>
+
+    <!-- 6. SNOWBALL QUEUE -->
+    <div class="card">
+      <div class="queue-head">
+        <span class="lbl">Snowball Queue</span>
+        <div class="queue-controls">
+          <div class="strat-toggle">
+            <button id="strat-snow" class="active" onclick="setStrategy('snowball')">SNOW</button>
+            <button id="strat-aval" onclick="setStrategy('avalanche')">AVAL</button>
+          </div>
+          <span class="add-btn" title="Add debt">⊕</span>
+        </div>
+      </div>
+      <div id="queue"></div>
+    </div>
+
+    <!-- 7. DAILY QUESTS -->
+    <div class="card">
+      <div class="queue-head">
+        <span class="lbl">◎ Daily Quests</span>
+        <span style="font-size:11px;font-family:ui-monospace,monospace;color:rgba(255,255,255,0.5);"><span id="q-done">1</span> / 3</span>
+      </div>
+      <div id="quests"></div>
+    </div>
+
+    <!-- 8. TROPHY HALL -->
+    <div class="card">
+      <div class="queue-head">
+        <span class="lbl">Trophy Hall</span>
+        <span style="font-size:11px;font-family:ui-monospace,monospace;color:rgba(255,255,255,0.5);">7 / 16</span>
+      </div>
+      <div class="trophy-grid" id="trophies"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>Single self-contained file · 100% generic · no personal identifiers · share freely.<br>Mirrors <code>DebtQuest/Features/DebtTab/*</code>.</footer>
+
+<script>
+  const THEMES = [
+    { id:"default",   name:"Cyan",      bg:"linear-gradient(135deg,#0a0e1a,#131831)",                  accent:"#06b6d4" },
+    { id:"ocean",     name:"Ocean",     bg:"linear-gradient(135deg,#001220,#003045,#004060)",          accent:"#0ea5e9" },
+    { id:"jungle",    name:"Jungle",    bg:"linear-gradient(135deg,#051a0d,#0c2920,#1a3d2a)",          accent:"#10b981" },
+    { id:"cyberpunk", name:"Cyberpunk", bg:"linear-gradient(135deg,#0a0014,#1a0033,#2a0044)",          accent:"#ff00ff" },
+    { id:"sunset",    name:"Sunset",    bg:"linear-gradient(135deg,#1a0808,#3d0a0a,#5a1c0a,#8a3c12)",  accent:"#f97316" },
+    { id:"classy",    name:"Classy",    bg:"linear-gradient(135deg,#0f0f0f,#1f1a0a,#2a2010)",          accent:"#fbbf24" },
+    { id:"retro",     name:"Retro",     bg:"linear-gradient(180deg,#1a0033,#4a0080,#ff00aa)",          accent:"#00ffaa" },
+    { id:"pink",      name:"Pink",      bg:"linear-gradient(135deg,#2a0a1f,#4a1538,#6a2050)",          accent:"#ec4899" },
+  ];
+  function setTheme(id) {
+    const t = THEMES.find(x => x.id === id); if (!t) return;
+    document.documentElement.style.setProperty("--bg", t.bg);
+    document.documentElement.style.setProperty("--accent", t.accent);
+    document.getElementById("phone").style.background = t.bg;
+    document.getElementById("theme-bar").innerHTML = THEMES.map(x =>
+      `<button class="theme-btn ${x.id===id?'active':''}" style="--accent:${x.accent}" onclick="setTheme('${x.id}')">${x.name}</button>`
+    ).join("");
+  }
+
+  // CLOCK
+  setInterval(() => {
+    document.getElementById("clock").textContent =
+      new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" });
+  }, 1000);
+
+  // STAGES
+  const STAGES = ["Foundation", "Walls Up", "Roof On", "Windows In", "Landscaped", "Keys Day! 🔑"];
+  const currentStage = 3; // 0-indexed
+  document.getElementById("stages").innerHTML = STAGES.map((_, i) =>
+    `<div class="stage-dot ${i <= currentStage ? 'lit' : ''}"></div>`
+  ).join("");
+
+  // QUEUE
+  const QUEUE = [
+    { name: "Citi Visa",      balance: 8472,  original: 10500, apr: 31.99, min: 175, killed: false },
+    { name: "Discover Card",  balance: 2890,  original: 4200,  apr: 27.99, min: 75,  killed: false },
+    { name: "Chase Sapphire", balance: 1420,  original: 2500,  apr: 22.99, min: 50,  killed: false },
+    { name: "Auto Loan",      balance: 12000, original: 18000, apr: 6.99,  min: 350, killed: false },
+    { name: "Store Card",     balance: 0,     original: 800,   apr: 29.99, min: 25,  killed: true  },
+    { name: "Medical Bill",   balance: 0,     original: 350,   apr: 0,     min: 30,  killed: true  },
+  ];
+  function bossFor(apr) {
+    if (apr < 10) return { e: "🐌", n: "Sloth Lender",  c: "#a3a3a3" };
+    if (apr < 20) return { e: "🦊", n: "Crafty Fox",    c: "#f59e0b" };
+    if (apr < 25) return { e: "🐍", n: "Snake Charmer", c: "#84cc16" };
+    if (apr < 30) return { e: "🦈", n: "Loan Shark",    c: "#3b82f6" };
+    return                { e: "🐉", n: "The Dragon",   c: "#dc2626" };
+  }
+  function fmt$(n) { return "$" + n.toLocaleString(); }
+
+  let strategy = "snowball";
+  function setStrategy(s) {
+    strategy = s;
+    document.getElementById("strat-snow").classList.toggle("active", s === "snowball");
+    document.getElementById("strat-aval").classList.toggle("active", s === "avalanche");
+    renderQueue();
+  }
+  function renderQueue() {
+    const active = QUEUE.filter(d => !d.killed);
+    const killed = QUEUE.filter(d => d.killed);
+    const ordered = strategy === "snowball"
+      ? active.slice().sort((a,b) => a.balance - b.balance)
+      : active.slice().sort((a,b) => b.apr - a.apr);
+    const renderRow = (d, isTarget) => {
+      const b = bossFor(d.apr);
+      const pct = d.original > 0 ? Math.max(0, Math.min(1, (d.original - d.balance) / d.original)) : 0;
+      return `<div class="row ${isTarget?'target-row':''} ${d.killed?'killed':''}" style="--rc:${b.c}">
+        <div class="boss-circle">${b.e}</div>
+        <div class="mid">
+          <div class="name-row">
+            <span class="name">${d.name}</span>
+            ${isTarget && !d.killed ? '<span class="target-pill">◎ TARGET</span>' : ''}
+          </div>
+          <div class="bar"><div class="bar-f" style="width:${(pct*100).toFixed(0)}%"></div></div>
+          <div class="meta"><span class="bal">${fmt$(d.balance)}</span><span>·</span><span>${d.apr}%</span></div>
+        </div>
+        ${d.killed ? '<div class="paid-stamp">PAID</div>' : '<div class="chev">›</div>'}
+      </div>`;
+    };
+    document.getElementById("queue").innerHTML =
+      ordered.map((d, i) => renderRow(d, i === 0)).join("") +
+      (killed.length ? `<div class="killed-hdr">Killed</div>` + killed.map(d => renderRow(d, false)).join("") : "");
+  }
+
+  // QUESTS
+  const QUESTS = [
+    { kind: "Log a payment",          icon: "$", done: true,  xp: 25 },
+    { kind: "View debt-free date",    icon: "↗", done: false, xp: 25 },
+    { kind: "Pay over the minimum",   icon: "↑", done: false, xp: 25 },
+  ];
+  function renderQuests() {
+    document.getElementById("quests").innerHTML = QUESTS.map((q, i) =>
+      `<div class="quest-row ${q.done?'done':''}" onclick="toggleQuest(${i})">
+        <div class="quest-icon">${q.done ? '✓' : q.icon}</div>
+        <div class="quest-name">${q.kind}</div>
+        <div class="quest-xp">⚡ +${q.xp}</div>
+      </div>`
+    ).join("");
+    document.getElementById("q-done").textContent = QUESTS.filter(q => q.done).length;
+  }
+  function toggleQuest(i) {
+    QUESTS[i].done = !QUESTS[i].done;
+    renderQuests();
+  }
+
+  // TROPHIES
+  const TROPHIES = [
+    { name: "Three in a Row",   icon: "🔥", tier: "bronze", earned: true },
+    { name: "First Blood",      icon: "🛡", tier: "bronze", earned: true },
+    { name: "First Grand",      icon: "$", tier: "bronze", earned: true },
+    { name: "One Week Strong",  icon: "🔥", tier: "silver", earned: true },
+    { name: "Triple Threat",    icon: "🛡", tier: "silver", earned: true },
+    { name: "Five Figures",     icon: "$", tier: "silver", earned: true },
+    { name: "Quarter Way",      icon: "📊", tier: "bronze", earned: true },
+    { name: "Halfway Home",     icon: "📊", tier: "silver", earned: false },
+    { name: "Month Master",     icon: "🔥", tier: "gold",   earned: false },
+    { name: "Debt Hunter",      icon: "🏆", tier: "gold",   earned: false },
+    { name: "Quarter Slayer",   icon: "💵", tier: "gold",   earned: false },
+    { name: "Final Stretch",    icon: "↗", tier: "gold",   earned: false },
+    { name: "Centurion",        icon: "🔥", tier: "plat",   earned: false },
+    { name: "Dragon Slayer",    icon: "🔥", tier: "plat",   earned: false },
+    { name: "Debt-Free Hero",   icon: "💰", tier: "plat",   earned: false },
+    { name: "Debt Free!",       icon: "👑", tier: "plat",   earned: false },
+  ];
+  document.getElementById("trophies").innerHTML = TROPHIES.map(t =>
+    `<div class="trophy ${t.earned?'earned':''}">
+      <div class="medal ${t.earned?t.tier:'locked'}">${t.icon}</div>
+      <div class="t-name">${t.name}</div>
+    </div>`
+  ).join("");
+
+  // INIT
+  setTheme("default");
+  renderQueue();
+  renderQuests();
+</script>
+</body>
+</html>
