@@ -3372,12 +3372,8 @@
 <script>
   // ============= DATA =============
   const CARDS_DEFAULT = [
-    { id: 1,  name: "Capital One #2",  balance: 270,  rate: 28.74, due: "Mar 3",  minimum: 50  },
-    { id: 2,  name: "Target",          balance: 290,  rate: 27.15, due: "Mar 24", minimum: 50  },
-    { id: 3,  name: "Erika's BOA",     balance: 300,  rate: 28.24, due: "Mar 25", minimum: 50  },
-    { id: 4,  name: "Prime",           balance: 390,  rate: 29.99, due: "Mar 8",  minimum: 50  },
-    { id: 5,  name: "Erika's CO",      balance: 400,  rate: 29.24, due: "Mar 4",  minimum: 50  },
-    { id: 6,  name: "Bank of America", balance: 470,  rate: 27.99, due: "Mar 1",  minimum: 50  },
+    // Note: Cards 1-6 (Capital One #2, Target, Erika's BOA, Prime, Erika's CO, Bank of America)
+    // were legacy sample data from the template — removed Jun 2026 to match Freddy's real 9 cards.
     { id: 7,  name: "Credit One Red",  balance: 581.68,  rate: 28.74, due: "23", minimum: 30,  creditLimit: 600,  last4: "9303", issuer: "Credit One", network: "Visa" },
     { id: 8,  name: "BrightWay",       balance: 506.45,  rate: 29.50, due: "10", minimum: 25,  creditLimit: 600,  last4: "3574", issuer: "OneMain Financial", network: "Mastercard" },
     { id: 9,  name: "Credit One Green",balance: 862.12,  rate: 27.49, due: "29", minimum: 44,  creditLimit: 900,  last4: "8324", issuer: "Credit One", network: "Visa" },
@@ -3529,6 +3525,22 @@
       });
     }
     co._coSyncedV4 = true;
+  })();
+
+  // ============= REMOVE LEGACY SAMPLE CARDS =============
+  // The original template included 6 sample cards (Capital One #2, Target, Erika's BOA,
+  // Prime, Erika's CO, Bank of America) that aren't Freddy's real cards. Strip them
+  // from localStorage so stats reflect his actual 9 cards.
+  (function removeLegacySampleCardsV1() {
+    const legacyNames = new Set([
+      'Capital One #2', 'Target', "Erika's BOA", 'Prime', "Erika's CO", 'Bank of America'
+    ]);
+    const before = cards.length;
+    cards = cards.filter(c => !legacyNames.has(c.name));
+    if (cards.length !== before) {
+      // Save immediately so the next load doesn't see them again
+      try { localStorage.setItem('lopez_cards', JSON.stringify(cards)); } catch (e) {}
+    }
   })();
 
   // ============= FIRST KILL: BrightWay paid off in full =============
@@ -8970,7 +8982,7 @@ Keep going, brother. 💪
     const lastKill = killedCards.sort((a,b) => new Date(b.killedAt) - new Date(a.killedAt))[0];
     let lastKillLabel = 'No kills yet — first one is the hardest 💪';
     if (lastKill) {
-      const daysSince = Math.floor((today - new Date(lastKill.killedAt)) / 86400000);
+      const daysSince = Math.max(0, Math.floor((today - new Date(lastKill.killedAt)) / 86400000));
       lastKillLabel = daysSince === 0
         ? `🔥 ${lastKill.name} killed TODAY!`
         : `🔥 Last kill: ${lastKill.name} · ${daysSince} day${daysSince !== 1 ? 's' : ''} ago`;
