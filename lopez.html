@@ -3558,11 +3558,11 @@
     bw.balance = 0;
     bw.killed = true;
     bw.killedAt = isoNow;
-    // Add to wins log
-    if (typeof wins !== 'undefined' && Array.isArray(wins)) {
-      wins.unshift({ icon: '🔥', text: `KILLED BrightWay! Paid ${'$' + paymentAmount.toFixed(2)} — first card down 🎉`, stamp: prettyStamp });
-      wins.unshift({ icon: '💸', text: `Paid ${'$' + paymentAmount.toFixed(2)} on BrightWay (full balance)`, stamp: prettyStamp });
-    }
+    // Defer wins log push until after `let wins` runs (script-scope TDZ-safe)
+    bw._pendingWinsLog = [
+      { icon: '🔥', text: `KILLED BrightWay! Paid ${'$' + paymentAmount.toFixed(2)} — first card down 🎉`, stamp: prettyStamp },
+      { icon: '💸', text: `Paid ${'$' + paymentAmount.toFixed(2)} on BrightWay (full balance)`, stamp: prettyStamp }
+    ];
     bw._brightwayKilledV1 = true;
   })();
 
@@ -3649,6 +3649,15 @@
   let milestones = JSON.parse(localStorage.getItem('lopez_milestones') || 'null') || MILESTONES_DEFAULT;
   let wins = JSON.parse(localStorage.getItem('lopez_wins') || '[]');
   let scores = JSON.parse(localStorage.getItem('lopez_scores') || '[]');
+
+  // Flush any pending wins log entries from sync functions that ran before `wins` was declared.
+  // (Prevents Temporal Dead Zone errors when those syncs try to push to the wins array.)
+  cards.forEach(c => {
+    if (Array.isArray(c._pendingWinsLog)) {
+      c._pendingWinsLog.forEach(entry => wins.unshift(entry));
+      delete c._pendingWinsLog;
+    }
+  });
 
   const SAVINGS_DEFAULTS = [
     { id: 'sv_money',     name: 'Money',                       last4: '7083', balance: 316.38,  category: 'main',      goal: 0 },
