@@ -3515,6 +3515,37 @@
 </div>
 
 <script>
+  // ============= 🔄 ONE-TAP RESET (URL: ?reset=1) =============
+  // Wipes all lopez_* localStorage keys + sync flags, then reloads to a clean URL.
+  // Triggered by adding ?reset=1 to the URL. Used when Freddy needs to start fresh
+  // on a new device or when localStorage is in a corrupted state. Sync functions
+  // will then rebuild his state from defaults (BrightWay killed, Cap1 priority,
+  // $1,000 savings, all bills paid for June, etc.).
+  (function maybeReset() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('reset') === '1' || params.get('forceSync') === '1') {
+        const before = Object.keys(localStorage).length;
+        // Wipe everything (lopez_* keys + sync flag keys)
+        const keysToWipe = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.startsWith('lopez_') || k.startsWith('debtquest_'))) keysToWipe.push(k);
+        }
+        keysToWipe.forEach(k => localStorage.removeItem(k));
+        // Bounce to clean URL (preserves the page, drops the param)
+        const cleanUrl = window.location.pathname + window.location.hash;
+        // Show a tiny banner so the user knows what happened
+        document.title = '🔄 Resetting...';
+        window.location.replace(cleanUrl);
+        // Halt remaining script — page will reload via the replace() above
+        throw new Error('__RESET_BOUNCE__');
+      }
+    } catch (e) {
+      if (e.message !== '__RESET_BOUNCE__') console.warn('Reset check failed:', e);
+    }
+  })();
+
   // ============= DATA =============
   const CARDS_DEFAULT = [
     // Note: Cards 1-6 (Capital One #2, Target, Erika's BOA, Prime, Erika's CO, Bank of America)
