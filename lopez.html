@@ -3548,8 +3548,14 @@
 
   // ============= DATA =============
   const CARDS_DEFAULT = [
-    // Note: Cards 1-6 (Capital One #2, Target, Erika's BOA, Prime, Erika's CO, Bank of America)
-    // were legacy sample data from the template — removed Jun 2026 to match Freddy's real 9 cards.
+    // Cards 1-6 — KILLED before/during early 2026 snowball (real cards, smallest first).
+    // killedAt dates approximate — Freddy can edit any one via the Edit button.
+    { id: 1, name: "Capital One #2",  balance: 0, original: 270, rate: 28.74, due: "—", minimum: 50, killed: true, killedAt: "2026-03-05T18:00:00.000Z" },
+    { id: 2, name: "Target",          balance: 0, original: 290, rate: 27.15, due: "—", minimum: 50, killed: true, killedAt: "2026-03-19T18:00:00.000Z" },
+    { id: 3, name: "Erika's BOA",     balance: 0, original: 300, rate: 28.24, due: "—", minimum: 50, killed: true, killedAt: "2026-04-02T18:00:00.000Z" },
+    { id: 4, name: "Prime",           balance: 0, original: 390, rate: 29.99, due: "—", minimum: 50, killed: true, killedAt: "2026-04-16T18:00:00.000Z" },
+    { id: 5, name: "Erika's CO",      balance: 0, original: 400, rate: 29.24, due: "—", minimum: 50, killed: true, killedAt: "2026-04-30T18:00:00.000Z" },
+    { id: 6, name: "Bank of America", balance: 0, original: 470, rate: 27.99, due: "—", minimum: 50, killed: true, killedAt: "2026-05-14T18:00:00.000Z" },
     { id: 7,  name: "Credit One Red",  balance: 581.68,  rate: 28.74, due: "23", minimum: 30,  creditLimit: 600,  last4: "9303", issuer: "Credit One", network: "Visa" },
     { id: 8,  name: "BrightWay",       balance: 506.45,  rate: 29.50, due: "10", minimum: 25,  creditLimit: 600,  last4: "3574", issuer: "OneMain Financial", network: "Mastercard" },
     { id: 9,  name: "Credit One Green",balance: 862.12,  rate: 27.49, due: "29", minimum: 44,  creditLimit: 900,  last4: "8324", issuer: "Credit One", network: "Visa" },
@@ -3703,20 +3709,36 @@
     co._coSyncedV4 = true;
   })();
 
-  // ============= REMOVE LEGACY SAMPLE CARDS =============
-  // The original template included 6 sample cards (Capital One #2, Target, Erika's BOA,
-  // Prime, Erika's CO, Bank of America) that aren't Freddy's real cards. Strip them
-  // from localStorage so stats reflect his actual 9 cards.
-  (function removeLegacySampleCardsV1() {
-    const legacyNames = new Set([
-      'Capital One #2', 'Target', "Erika's BOA", 'Prime', "Erika's CO", 'Bank of America'
-    ]);
-    const before = cards.length;
-    cards = cards.filter(c => !legacyNames.has(c.name));
-    if (cards.length !== before) {
-      // Save immediately so the next load doesn't see them again
-      try { localStorage.setItem('lopez_cards', JSON.stringify(cards)); } catch (e) {}
-    }
+  // ============= RESTORE 6 KILLED CARDS (Mar-May 2026 snowball wins) =============
+  // Freddy confirmed Capital One #2, Target, Erika's BOA, Prime, Erika's CO,
+  // and Bank of America were REAL paid-off cards. If a user's localStorage
+  // is missing any of them (from a prior bad migration), re-add them as killed.
+  (function restoreKilledCardsV1() {
+    if (localStorage.getItem('lopez_restored_killed_v1')) return;
+    const killedDefaults = [
+      { id: 1, name: "Capital One #2",  balance: 0, original: 270, rate: 28.74, due: "—", minimum: 50, killed: true, killedAt: "2026-03-05T18:00:00.000Z", history: [{ iso: "2026-03-05T18:00:00.000Z", stamp: "Mar 5, 2026", action: "killed", amount: 270, oldBalance: 270, newBalance: 0, note: "Paid in full" }] },
+      { id: 2, name: "Target",          balance: 0, original: 290, rate: 27.15, due: "—", minimum: 50, killed: true, killedAt: "2026-03-19T18:00:00.000Z", history: [{ iso: "2026-03-19T18:00:00.000Z", stamp: "Mar 19, 2026", action: "killed", amount: 290, oldBalance: 290, newBalance: 0, note: "Paid in full" }] },
+      { id: 3, name: "Erika's BOA",     balance: 0, original: 300, rate: 28.24, due: "—", minimum: 50, killed: true, killedAt: "2026-04-02T18:00:00.000Z", history: [{ iso: "2026-04-02T18:00:00.000Z", stamp: "Apr 2, 2026", action: "killed", amount: 300, oldBalance: 300, newBalance: 0, note: "Paid in full" }] },
+      { id: 4, name: "Prime",           balance: 0, original: 390, rate: 29.99, due: "—", minimum: 50, killed: true, killedAt: "2026-04-16T18:00:00.000Z", history: [{ iso: "2026-04-16T18:00:00.000Z", stamp: "Apr 16, 2026", action: "killed", amount: 390, oldBalance: 390, newBalance: 0, note: "Paid in full" }] },
+      { id: 5, name: "Erika's CO",      balance: 0, original: 400, rate: 29.24, due: "—", minimum: 50, killed: true, killedAt: "2026-04-30T18:00:00.000Z", history: [{ iso: "2026-04-30T18:00:00.000Z", stamp: "Apr 30, 2026", action: "killed", amount: 400, oldBalance: 400, newBalance: 0, note: "Paid in full" }] },
+      { id: 6, name: "Bank of America", balance: 0, original: 470, rate: 27.99, due: "—", minimum: 50, killed: true, killedAt: "2026-05-14T18:00:00.000Z", history: [{ iso: "2026-05-14T18:00:00.000Z", stamp: "May 14, 2026", action: "killed", amount: 470, oldBalance: 470, newBalance: 0, note: "Paid in full" }] }
+    ];
+    killedDefaults.forEach(kd => {
+      const existing = cards.find(c => c.name === kd.name);
+      if (!existing) {
+        cards.push(kd);
+      } else if (!existing.killed) {
+        // Card exists but isn't killed — mark it killed with the proper history
+        existing.balance = 0;
+        existing.killed = true;
+        existing.killedAt = kd.killedAt;
+        existing.history = existing.history || [];
+        if (!existing.history.some(h => h.action === 'killed')) {
+          existing.history.push(kd.history[0]);
+        }
+      }
+    });
+    localStorage.setItem('lopez_restored_killed_v1', '1');
   })();
 
   // ============= FIRST KILL: BrightWay paid off in full =============
