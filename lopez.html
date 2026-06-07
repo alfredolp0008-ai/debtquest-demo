@@ -2072,6 +2072,144 @@
     pointer-events: none;
   }
 
+  /* ============== 🏆 HALL OF KILLS — killed cards celebration ============== */
+  .hok-shell {
+    position: relative;
+    border-radius: 22px;
+    padding: 18px 20px;
+    background:
+      radial-gradient(ellipse at top left, rgba(16,185,129,0.20), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(251,191,36,0.15), transparent 55%),
+      linear-gradient(135deg, rgba(15,46,33,0.95), rgba(20,40,30,0.95));
+    border: 2px solid rgba(16,185,129,0.50);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.06) inset,
+      0 30px 80px -20px rgba(16,185,129,0.25),
+      0 0 60px rgba(251,191,36,0.08);
+    overflow: hidden;
+  }
+  .hok-shell::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent 0 22px, rgba(255,255,255,0.018) 22px 23px);
+    pointer-events: none;
+  }
+  .hok-header {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .hok-count-badge {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #b45309);
+    color: #1a1a1a;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 6px 18px -6px rgba(251,191,36,0.6), 0 0 0 1px rgba(255,255,255,0.2) inset;
+  }
+  .hok-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    position: relative;
+  }
+  .hok-card {
+    position: relative;
+    background:
+      radial-gradient(ellipse at top, rgba(251,191,36,0.18), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,15,0.85), rgba(15,46,33,0.85));
+    border: 2px solid rgba(251,191,36,0.45);
+    border-radius: 16px;
+    padding: 16px 14px 14px;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 12px 30px -12px rgba(16,185,129,0.4);
+  }
+  .hok-card:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 18px 40px -12px rgba(251,191,36,0.5);
+  }
+  .hok-card::before {
+    content: '';
+    position: absolute; top: -30px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(251,191,36,0.30), transparent 65%);
+    pointer-events: none;
+  }
+  .hok-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.015) 3px 4px);
+    pointer-events: none;
+  }
+  .hok-trophy {
+    font-size: 42px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 4px 14px rgba(251,191,36,0.6));
+    animation: hok-trophy-shine 3s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+  @keyframes hok-trophy-shine {
+    0%, 100% { transform: scale(1) rotate(-2deg); }
+    50% { transform: scale(1.08) rotate(2deg); }
+  }
+  .hok-card-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fde68a;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+    position: relative; z-index: 2;
+  }
+  .hok-card-amount {
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #6ee7b7, #10b981, #059669);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    position: relative; z-index: 2;
+  }
+  .hok-card-meta {
+    margin-top: 8px;
+    display: flex; justify-content: space-around;
+    gap: 8px;
+    font-size: 10px;
+    color: rgba(254,243,199,0.75);
+    font-weight: 700;
+    position: relative; z-index: 2;
+  }
+  .hok-card-stamp {
+    margin-top: 10px;
+    padding: 3px 10px;
+    background: rgba(16,185,129,0.30);
+    border: 1px solid rgba(16,185,129,0.55);
+    border-radius: 999px;
+    color: #6ee7b7;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: inline-block;
+    position: relative; z-index: 2;
+  }
+  .hok-empty {
+    text-align: center;
+    padding: 32px 20px;
+    color: rgba(254,243,199,0.7);
+  }
+  .hok-empty-trophy {
+    font-size: 64px;
+    opacity: 0.4;
+    margin-bottom: 8px;
+    filter: grayscale(0.5);
+  }
+
   /* ============== 🏆 FRONT PAGE HERO — top of page glance ============== */
   .fph-shell {
     position: relative;
@@ -2459,6 +2597,13 @@
 <section class="max-w-7xl mx-auto mb-4 keep-in-today">
   <div id="survival-widget" class="survival-shell">
     <!-- populated by renderSurvivalNumber() -->
+  </div>
+</section>
+
+<!-- 🏆 HALL OF KILLS — celebrated dead cards (always visible for motivation) -->
+<section class="max-w-7xl mx-auto mb-4 keep-in-today">
+  <div id="hall-of-kills" class="hok-shell">
+    <!-- populated by renderHallOfKills() -->
   </div>
 </section>
 
@@ -9047,6 +9192,80 @@ Keep going, brother. 💪
     `;
   }
 
+  // ============= 🏆 HALL OF KILLS — celebrates paid-off cards =============
+  // Always visible in Today Mode. Each killed card gets a trophy card with
+  // name, total paid, kill date, days-since. Empty state encourages first kill.
+  function renderHallOfKills() {
+    const root = document.getElementById('hall-of-kills');
+    if (!root) return;
+
+    const killed = cards.filter(c => c.killed);
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Sort by most recent kill first
+    killed.sort((a, b) => new Date(b.killedAt || 0) - new Date(a.killedAt || 0));
+
+    // Total ever paid on killed cards
+    const totalKilledAmount = killed.reduce((sum, c) => {
+      const fromHistory = (c.history || []).reduce((s, h) =>
+        h.action === 'payment' && typeof h.amount === 'number' ? s + h.amount : s, 0);
+      return sum + (fromHistory > 0 ? fromHistory : (c.original || 0));
+    }, 0);
+
+    const totalCards = cards.length;
+    const killCount = killed.length;
+    const killPct = totalCards > 0 ? Math.round((killCount / totalCards) * 100) : 0;
+
+    const cardsHtml = killed.length > 0 ? killed.map(c => {
+      const killedDate = new Date(c.killedAt || new Date());
+      const daysSince = Math.max(0, Math.floor((today - killedDate) / 86400000));
+      const dayLabel = daysSince === 0 ? 'TODAY' :
+                       daysSince === 1 ? 'Yesterday' :
+                       daysSince < 7 ? `${daysSince} days ago` :
+                       daysSince < 30 ? `${Math.floor(daysSince / 7)} wk ago` :
+                       `${Math.floor(daysSince / 30)} mo ago`;
+      const dateStr = killedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      // Compute total paid on this card from history (better than original)
+      const fromHistory = (c.history || []).reduce((s, h) =>
+        h.action === 'payment' && typeof h.amount === 'number' ? s + h.amount : s, 0);
+      const totalPaid = fromHistory > 0 ? fromHistory : (c.original || 0);
+      // Trophy emoji escalates with size of kill
+      const trophy = totalPaid >= 2000 ? '👑' :
+                     totalPaid >= 1000 ? '🏆' :
+                     totalPaid >= 500  ? '🥇' :
+                                          '🎖️';
+      return `
+        <div class="hok-card" onclick="showCardDetail(${c.id})">
+          <div class="hok-trophy">${trophy}</div>
+          <div class="hok-card-name">${c.name}</div>
+          <div class="hok-card-amount">${fmt(totalPaid)}</div>
+          <div class="hok-card-meta">
+            <span>📅 ${dateStr}</span>
+            <span>⏱️ ${dayLabel}</span>
+          </div>
+          <div class="hok-card-stamp">💀 KILLED</div>
+        </div>`;
+    }).join('') : `
+      <div class="hok-empty" style="grid-column: 1 / -1;">
+        <div class="hok-empty-trophy">🏆</div>
+        <div class="text-amber-300 font-bold text-base">Trophy Case Awaits</div>
+        <div class="text-amber-200/60 text-sm mt-1">Your first kill goes here. Smallest card first — momentum wins.</div>
+      </div>`;
+
+    root.innerHTML = `
+      <div class="hok-header">
+        <span class="mmc-pill" style="background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.45); color: #fbbf24;">🏆 Hall of Kills</span>
+        <span class="text-white font-black text-base sm:text-lg tracking-tight">Cards You've Destroyed</span>
+        ${killCount > 0 ? `<span class="hok-count-badge ml-auto">${killCount} 🔥 · ${fmt(totalKilledAmount)} paid</span>` : ''}
+      </div>
+      <div class="hok-grid">${cardsHtml}</div>
+      ${killCount > 0 ? `
+        <div class="text-[11px] text-amber-200/70 mt-3 text-center">
+          ${killPct}% of cards destroyed · ${totalCards - killCount} still standing
+        </div>` : ''}
+    `;
+  }
+
   // ============= 🏆 FRONT PAGE HERO — top-of-page glance =============
   // The 4 stats Freddy wants to see EVERY time he opens the app:
   // 1) Days to close (Nov 1, 2026)
@@ -9733,6 +9952,7 @@ Keep going, brother. 💪
     renderMortgageMissionControl();
     renderUtilMission();
     renderSurvivalNumber();
+    renderHallOfKills();
     renderTodayHero();
     renderWealthCommandCenter();
     renderSavings();
